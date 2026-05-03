@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowBudget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <p class="eyebrow">Personal Monthly Finance Tracker</p>
+        <h1>FlowBudget</h1>
+        <p class="subtitle">Know where your money goes.</p>
+      </div>
+      <div class="topbar-controls">
+        <div class="account-cluster">
+          <label class="control-chip account-chip">
+            <span>Account Email</span>
+            <input id="emailInput" type="email" placeholder="name@example.com" autocomplete="email">
+          </label>
+          <div class="account-actions">
+            <button id="registerAccountBtn" class="secondary-button" type="button">Register</button>
+            <label class="control-chip account-select-chip">
+              <span>Saved Accounts</span>
+              <select id="accountPicker">
+                <option value="">Guest</option>
+              </select>
+            </label>
+          </div>
+          <p id="accountStatus" class="account-status">Using guest mode. Register an email to save a personal state.</p>
+        </div>
+        <div class="utility-cluster">
+          <label class="control-chip compact-chip">
+            <span>Month</span>
+            <input id="monthPicker" type="month">
+          </label>
+          <label class="control-chip compact-chip">
+            <span>Currency</span>
+            <select id="currencyPicker">
+              <option value="USD">USD</option>
+              <option value="ETB">ETB</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </label>
+          <button id="themeToggle" class="ghost-button utility-button" type="button" aria-label="Toggle theme">Light mode</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel input-panel">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Inputs</p>
+            <h2>Build your month</h2>
+          </div>
+          <div class="panel-actions compact">
+            <button id="calculateBtn" class="primary-button" type="button">Calculate</button>
+            <button id="resetBtn" class="ghost-button" type="button">Reset</button>
+          </div>
+        </div>
+
+        <section class="entry-section">
+          <div class="section-title-row">
+            <div>
+              <p class="section-kicker positive">+ Income Sources</p>
+              <p class="section-caption">Track every stream feeding this month.</p>
+            </div>
+            <button id="addIncomeBtn" class="secondary-button" type="button">Add Income</button>
+          </div>
+          <div id="incomeList" class="entry-list"></div>
+        </section>
+
+        <section class="entry-section">
+          <div class="section-title-row">
+            <div>
+              <p class="section-kicker negative">- Expenses</p>
+              <p class="section-caption">Group spending by category and amount.</p>
+            </div>
+            <button id="addExpenseBtn" class="secondary-button" type="button">Add Expense</button>
+          </div>
+          <div id="expenseList" class="entry-list"></div>
+        </section>
+      </section>
+
+      <section id="summaryPanel" class="panel summary-panel">
+        <div class="stats-grid">
+          <article class="stat-card income">
+            <p>Total Income</p>
+            <h3 id="incomeTotal">$0</h3>
+          </article>
+          <article class="stat-card expenses">
+            <p>Total Expenses</p>
+            <h3 id="expenseTotal">$0</h3>
+          </article>
+          <article class="stat-card balance">
+            <p>Net Balance</p>
+            <h3 id="balanceTotal">$0</h3>
+          </article>
+        </div>
+
+        <div class="chart-stack">
+          <article class="chart-card">
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Breakdown</p>
+                <h2>Expense Breakdown</h2>
+              </div>
+            </div>
+            <div class="chart-wrap donut-wrap">
+              <canvas id="expenseChart"></canvas>
+            </div>
+            <div id="expenseLegend" class="legend-list"></div>
+          </article>
+
+          <article class="chart-card">
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Comparison</p>
+                <h2>Income vs Expenses</h2>
+              </div>
+            </div>
+            <div class="chart-wrap bar-wrap">
+              <canvas id="comparisonChart"></canvas>
+            </div>
+          </article>
+
+          <article class="chart-card">
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Usage</p>
+                <h2>Budget Usage</h2>
+              </div>
+              <button id="exportBtn" class="ghost-button" type="button">Export PNG</button>
+            </div>
+            <div class="usage-meter">
+              <div class="meter-track">
+                <div id="usageBar" class="meter-fill"></div>
+              </div>
+              <p id="usageLabel" class="usage-label">You've used 0% of your income.</p>
+            </div>
+          </article>
+        </div>
+
+        <section class="insights-card">
+          <div class="card-head">
+            <div>
+              <p class="section-kicker">Insights</p>
+              <h2>Spending Signals</h2>
+            </div>
+          </div>
+          <div id="insightsList" class="insights-list"></div>
+        </section>
+
+        <section class="table-card">
+          <div class="card-head">
+            <div>
+              <p class="section-kicker">Ranked View</p>
+              <h2>Expense Table</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>% of Expenses</th>
+                </tr>
+              </thead>
+              <tbody id="expenseTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="emptyState" class="empty-state">
+          <div class="empty-emoji">O</div>
+          <h2>No month mapped yet</h2>
+          <p>Add income and expense rows, then calculate to bring the dashboard to life.</p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
